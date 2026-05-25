@@ -17,3 +17,6 @@ output/tables/*.csv
 # OS files
 .DS_Store
 Thumbs.db
+
+/.quarto/
+**/*.quarto_ipynb
