@@ -1,0 +1,19 @@
+# R environment
+.Rhistory
+.RData
+.Rproj.user/
+
+# renv library (restored from lockfile, not committed)
+renv/library/
+renv/staging/
+renv/python/
+renv/sandbox/
+
+# Regenerated output (reproducible from code)
+output/figures/*.png
+output/figures/*.pdf
+output/tables/*.csv
+
+# OS files
+.DS_Store
+Thumbs.db
