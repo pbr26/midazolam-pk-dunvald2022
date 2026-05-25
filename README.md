@@ -59,7 +59,7 @@ Midazolam  Midazolam        ← Crossover (washout period between)
 
 ```r
 # 1. Clone the repository
-# git clone https://github.com/YOUR_USERNAME/midazolam-pk-dunvald2022.git
+# git clone https://github.com/pbr26/midazolam-pk-dunvald2022.git
 
 # 2. Open the .Rproj file in RStudio (double-click it)
 
@@ -124,7 +124,7 @@ GMR for AUClast = **0.70** — outside the 0.80–1.25 bioequivalence boundary, 
 
 ## Live report
 
-[View the rendered report →](https://YOUR_USERNAME.github.io/midazolam-pk-dunvald2022/)
+[View the rendered report →](https://pbr26.github.io/midazolam-pk-dunvald2022/)
 
 ## Skills demonstrated
 
