@@ -1,10 +1,25 @@
-<<<<<<< HEAD
-# Reproduction of Dunvald et al. (2022) — Clinical PK Tutorial
+
+# Reproducible Clinical PK Analysis in R — Educational Project Based on Dunvald et al. (2022)
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.2-blue)](https://www.r-project.org/)
 [![Quarto](https://img.shields.io/badge/Quarto-%3E%3D1.3-orange)](https://quarto.org/)
 [![License: CC BY-NC-ND](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 [![Reproducible](https://img.shields.io/badge/renv-locked-green)](renv.lock)
+
+> [!IMPORTANT]
+> ## Disclaimer
+>
+> This repository is an independent educational and portfolio-based pharmacokinetic analysis project created for learning, reproducibility, and scientific skill development purposes.
+>
+> The work is inspired by and references:
+>
+> **Dunvald A-CD, Iversen DB, Svendsen ALO, et al. Tutorial: Statistical analysis and reporting of clinical pharmacokinetic studies. Clinical and Translational Science. 2022;15:1856–1866.**
+>
+> All rights to the original publication, study design, and source material remain with the respective authors and publishers.
+>
+> This repository does not claim ownership of the original publication or associated intellectual property. Any recreated analyses, scripts, visualizations, or workflows were independently developed for educational demonstration and reproducible research practice only.
+>
+> This project is not intended for clinical decision-making, regulatory submission, or medical guidance.
 
 ## Overview
 
@@ -16,6 +31,31 @@ This repository reproduces the complete statistical analysis from:
 > DOI: [10.1111/cts.13305](https://doi.org/10.1111/cts.13305)
 
 The paper provides a mock dataset simulating a clinical pharmacokinetic drug–drug interaction (DDI) study: 12 healthy subjects administered 2 mg oral **midazolam** (CYP3A4 probe substrate) with and without a CYP3A inducer, in a crossover design.
+
+## 🚧 Project Status
+
+**Ongoing Live Learning Project**
+
+This repository is being actively developed as part of a continuous learning journey in:
+
+- Clinical Pharmacokinetics (PK)
+- Noncompartmental Analysis (NCA)
+- Reproducible Research
+- R-based PK workflows
+- Pharmacometric data analysis
+
+New analyses, validation steps, visualizations, and workflow improvements may be added over time as the project evolves.
+
+## Learning Objectives
+
+This project was developed to practice and demonstrate:
+
+- Clinical pharmacokinetic data analysis workflows
+- Noncompartmental analysis (NCA)
+- Bioequivalence and GMR calculations
+- Publication-quality PK visualization in R
+- Reproducible research practices using `renv` and Quarto
+- Transparent scientific reporting and workflow documentation
 
 ## What this project reproduces
 
@@ -152,9 +192,13 @@ Please cite the original paper (Dunvald et al. 2022) if you build on this work.
   volume  = {15},
   pages   = {1856--1866},
   doi     = {10.1111/cts.13305}
-}
+}gi
 ```
 =======
 # midazolam-pk-dunvald2022
 Reproduction of Dunvald 2022 clinical PK tutorial in R
+
+## Acknowledgment
+
+This project is an independent educational effort and is not affiliated with, endorsed by, or sponsored by the original authors, journal, or publishers.
 >>>>>>> 8c4fd1451b11b9497e456fa58aac0ce51bb56f54
