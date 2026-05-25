@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Reproduction of Dunvald et al. (2022) — Clinical PK Tutorial
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.2-blue)](https://www.r-project.org/)
@@ -153,3 +154,7 @@ Please cite the original paper (Dunvald et al. 2022) if you build on this work.
   doi     = {10.1111/cts.13305}
 }
 ```
+=======
+# midazolam-pk-dunvald2022
+Reproduction of Dunvald 2022 clinical PK tutorial in R
+>>>>>>> 8c4fd1451b11b9497e456fa58aac0ce51bb56f54
