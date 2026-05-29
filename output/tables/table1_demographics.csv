@@ -1,0 +1,9 @@
+Characteristic,Value,Note
+"Number of subjects, n",12,
+"Age, years",30.5 (28-35.2),Median (IQR)
+"Sex — Male, n (%)",6 (50%),
+"Sex — Female, n (%)",6 (50%),
+"Body weight, kg",67.2 (62.6-72.7),Median (IQR)
+"BMI, kg/m²",24.3 (21.6-25),Median (IQR)
+"Height, cm",167 (165-173.8),Median (IQR)
+"eGFR, mL/min/1.73m²",110.5 (103.2-116.2),Median (IQR)
