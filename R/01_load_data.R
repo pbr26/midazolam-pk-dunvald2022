@@ -2,7 +2,7 @@
 # 01_load_data.R
 # Project: Reproduction of Dunvald et al. (2022) Clinical PK Tutorial
 # Purpose: Reconstruct Table S1 mock dataset and save as clean CSV
-# Author:  [Your Name]
+# Author:  Pramod BR
 # Date:    2026-05-25
 #
 # What this script does:

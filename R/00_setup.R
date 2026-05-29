@@ -19,11 +19,14 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Step 1: Bootstrap renv (only needed once per project)
+
 # This installs renv itself and creates the project library scaffold
 if (!requireNamespace("renv", quietly = TRUE)) {
   install.packages("renv")
 }
-renv::init()   # Creates renv/ folder and renv.lock. Say YES when prompted.
+renv::init()  
+
+# Creates renv/ folder and renv.lock. Say YES when prompted.
 
 # ── WHY each package? ─────────────────────────────────────────────────────────
 
@@ -75,15 +78,16 @@ renv::init()   # Creates renv/ folder and renv.lock. Say YES when prompted.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Step 2: Install all project packages into the renv library
+
 packages <- c(
   # Core PK analysis
-  "ncappc",      # Paper's NCA package
+  "ncappc",      # Published Paper's NCA package
   "PKNCA",       # Cross-validation NCA
 
   # Data manipulation
-  "dplyr",
+  "dplyr",      
   "tidyr",
-  "readr",       # Fast CSV reading
+  "readr",      # Fast CSV reading
 
   # Visualisation
   "ggplot2",
@@ -121,8 +125,10 @@ for (pkg in packages) {
 }
 
 # ── SESSION INFO (save for reproducibility record) ────────────────────────────
+
 # This records R version, OS, all loaded packages and their versions.
 # Commit this output alongside your renv.lock.
+
 sink("session_info.txt")
 cat("Project: Dunvald 2022 Clinical PK Reproduction\n")
 cat("Date:    ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n\n")
