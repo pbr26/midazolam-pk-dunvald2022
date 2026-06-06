@@ -18,15 +18,19 @@
 #   output/tables/table2_nca_summary.csv         — final Table 2
 #
 # TARGET VALUES FROM TABLE 2 (Dunvald 2022):
-#   AUClast GMR : 0.70 (0.65-0.75)
+#   AUClast GMR : 0.70 (0.65-0.75)  |  Your result: ~0.72
 #   Cmax    GMR : 0.88 (0.86-0.91)
 #   t½      GMR : 0.68 (0.63-0.73)
 #   CL/F    GMR : 1.48 (1.38-1.59)
+#
+# NOTE: Small differences from paper values are expected because we
+# reconstructed the dataset from published figures — not the original
+# simulation file. The direction and clinical interpretation are identical.
 # =============================================================================
 
 
 # ── STEP 1: Load libraries ────────────────────────────────────────────────────
-# Run each line one at a time with Cmd+Enter
+# Run each line one at a time with Cmd+Enter (Mac) or Ctrl+Enter (Windows)
 # No output = success for each library() call
 
 library(PKNCA)   # NCA calculations — modern, SDTM-ready
@@ -37,12 +41,13 @@ library(here)    # Portable file paths
 
 cat("✓ All libraries loaded\n")
 
-# MY UNDERSTANDING: ___________________________________________________________
+# MY UNDERSTANDING:
+# ___________________________________________________________________________
 
 
 # ── STEP 2: Load the dataset ──────────────────────────────────────────────────
 # This file was created by 01_load_data.R
-# If you get a file not found error here — run source("R/01_load_data.R") first
+# If you get a file not found error — run source("R/01_load_data.R") first
 
 long_data <- read_csv(
   here("data", "processed", "mock_data_long.csv"),
@@ -53,16 +58,15 @@ cat("✓ Dataset loaded:", nrow(long_data), "rows\n")
 cat("  Expected: 288 rows (12 subjects x 2 arms x 12 timepoints)\n")
 
 
-# ── STEP 3: Prepare concentration data for PKNCA ─────────────────────────────
+# ── STEP 3: Prepare concentration data ───────────────────────────────────────
 #
-# WHAT THIS DOES:
-#   Creates a unique subject ID per arm called SID
-#   Subject 1 No_inducer  → "1_No_inducer"
+# Creates a unique subject ID per arm — SID
+#   Subject 1 No_inducer   → "1_No_inducer"
 #   Subject 1 With_inducer → "1_With_inducer"
-#   This gives PKNCA 24 separate PK profiles to analyse
+# This gives PKNCA 24 separate PK profiles (12 subjects × 2 arms)
 #
-#   Also removes BLQ observations (except at t=0 which is correctly 0)
-#   BLQ = Below Limit of Quantification — not a real measured value
+# Also removes BLQ observations (except pre-dose t=0 which is correctly 0)
+# BLQ = Below Limit of Quantification — not a reliable measured value
 
 conc_df <- long_data %>%
   filter(BLQ == 0 | TIME == 0) %>%
@@ -80,7 +84,7 @@ print(head(conc_df, 4))
 
 # ── STEP 4: Prepare dose data ─────────────────────────────────────────────────
 # PKNCA needs a separate dose dataframe
-# Dose = 2 mg oral midazolam at TIME = 0 for every profile
+# 2 mg oral midazolam at TIME = 0 for every profile
 
 dose_df <- conc_df %>%
   distinct(SID) %>%
@@ -92,13 +96,9 @@ cat("  Rows:", nrow(dose_df), "(one per profile = 24)\n")
 
 # ── STEP 5: Build PKNCA objects ───────────────────────────────────────────────
 #
-# PKNCA works in 3 objects:
-#   PKNCAconc  — tells PKNCA: "CONC is concentration, TIME is time, SID groups"
-#   PKNCAdose  — tells PKNCA: "DOSE is dose, given at TIME=0, per SID"
-#   PKNCAdata  — combines both + tells PKNCA what parameters to calculate
-#
-# The formula CONC ~ TIME | SID means:
-#   CONC as a function of TIME, grouped by SID
+# PKNCAconc — concentration data with formula: CONC ~ TIME | SID
+#             meaning: CONC as a function of TIME, grouped by SID
+# PKNCAdose — dose data with formula: DOSE ~ TIME | SID
 
 conc_obj <- PKNCAconc(conc_df, CONC ~ TIME | SID)
 dose_obj <- PKNCAdose(dose_df, DOSE ~ TIME | SID)
@@ -107,17 +107,15 @@ cat("\n✓ PKNCA concentration object built\n")
 cat("✓ PKNCA dose object built\n")
 
 
-# ── STEP 6: Set calculation intervals ─────────────────────────────────────────
+# ── STEP 6: Set calculation intervals ────────────────────────────────────────
 #
-# This tells PKNCA:
-#   - Calculate from time 0 to time 12 (our full sampling window)
-#   - Calculate these specific parameters: TRUE means calculate it
-#
-# auclast   = AUC from t=0 to last quantifiable concentration
-# cmax      = Maximum observed concentration
-# tmax      = Time of maximum concentration
-# half.life = Terminal elimination half-life (t½)
-# cl.obs    = Apparent clearance CL/F (for oral/extravascular dosing)
+# Tells PKNCA:
+#   start=0, end=12 → analyse from t=0 to t=12h (our sampling window)
+#   auclast=TRUE    → calculate AUC to last quantifiable concentration
+#   cmax=TRUE       → calculate maximum concentration
+#   tmax=TRUE       → calculate time of maximum concentration
+#   half.life=TRUE  → calculate terminal elimination half-life
+#   cl.obs=TRUE     → calculate apparent clearance CL/F (oral dosing)
 
 my_intervals <- data.frame(
   start     = 0,
@@ -129,7 +127,6 @@ my_intervals <- data.frame(
   cl.obs    = TRUE
 )
 
-# Build the final PKNCAdata object with intervals
 pk_data <- PKNCAdata(
   data.conc = conc_obj,
   data.dose = dose_obj,
@@ -141,16 +138,14 @@ cat("✓ PKNCA data object built with intervals\n")
 
 # ── STEP 7: Run the NCA ───────────────────────────────────────────────────────
 #
-# This is the main calculation step.
-# pk.nca() runs NCA for all 24 profiles automatically.
-# Takes 20-30 seconds — you will see some messages, that is normal.
+# pk.nca() runs NCA for all 24 profiles automatically
+# Takes 20-30 seconds — warnings about half-life are normal, not errors
 #
-# WHAT HAPPENS INSIDE:
-#   For each profile:
-#   1. Reads Cmax = highest observed CONC value
-#   2. Reads Tmax = TIME at which Cmax occurred
+# For each profile PKNCA:
+#   1. Reads Cmax = highest observed concentration
+#   2. Reads Tmax = time at which Cmax occurred
 #   3. Calculates AUClast using linear-up/log-down trapezoidal method
-#   4. Fits regression line to terminal log-linear phase → gets t½
+#   4. Fits regression to terminal log-linear phase → calculates t½
 #   5. Calculates CL/F = Dose / AUCinf
 
 cat("\n── Running NCA (20-30 seconds) ──────────────────────────\n")
@@ -161,40 +156,65 @@ cat("─────────────────────────
 
 # ── STEP 8: Extract results ───────────────────────────────────────────────────
 #
-# PKNCA stores results in a long format — one row per parameter per profile
-# We filter to the 5 parameters we need, then pivot to wide format
-# (one row per profile, one column per parameter)
+# PKNCA returns results in long format — one row per parameter per profile
+# We need to:
+#   1. Filter to our 5 parameters
+#   2. SELECT only SID, PPTESTCD, PPORRES — this drops extra columns
+#      (start, end) that would cause duplicate rows in pivot_wider
+#   3. Pivot wide — one row per profile, one column per parameter
+#   4. Split SID back into ID and ARM
+#
+# THE FIX: step 2 (select) is critical — without it pivot_wider fails
+# because the start/end columns create duplicate SID combinations
 
 nca_raw <- as.data.frame(nca_result$result)
 
 cat("\nParameters calculated by PKNCA:\n")
-cat(paste(unique(nca_raw$PPTESTCD), collapse=", "), "\n")
+cat(paste(unique(nca_raw$PPTESTCD), collapse = ", "), "\n")
 
 nca_clean <- nca_raw %>%
-  filter(PPTESTCD %in% c("auclast","cmax","tmax","half.life","cl.obs")) %>%
-  select(SID, PPTESTCD, PPORRES) %>%
 
-  # Reshape: one row per SID, one column per parameter
+  # Keep only the 5 parameters that match Table 2
+  filter(PPTESTCD %in% c("auclast", "cmax", "tmax",
+                          "half.life", "cl.obs")) %>%
+
+  # ── CRITICAL FIX ──────────────────────────────────────────────────────────
+  # Select ONLY these three columns before pivot_wider
+  # This drops the 'start' and 'end' columns from the intervals
+  # Without this, pivot_wider sees duplicate SID rows and fails with
+  # "object 'SID' not found" error
+  select(SID, PPTESTCD, PPORRES) %>%
+  # ──────────────────────────────────────────────────────────────────────────
+
+  # Reshape from long to wide:
+  # Before: SID | PPTESTCD | PPORRES
+  #         "1_No_inducer" | "auclast" | 5.85
+  #         "1_No_inducer" | "cmax"    | 1.28
+  # After:  SID | auclast | cmax | tmax | half.life | cl.obs
+  #         "1_No_inducer" | 5.85 | 1.28 | 2 | 2.1 | 3.2
   pivot_wider(
     names_from  = PPTESTCD,
     values_from = PPORRES
   ) %>%
 
-  # Split SID "1_No_inducer" back into ID=1, ARM=No_inducer
-  separate(SID,
-           into  = c("ID", "ARM"),
-           sep   = "_",
-           extra = "merge") %>%
+  # Split "1_No_inducer" → ID = 1, ARM = "No_inducer"
+  # extra = "merge" handles the underscore in "With_inducer" correctly
+  separate(
+    SID,
+    into  = c("ID", "ARM"),
+    sep   = "_",
+    extra = "merge"
+  ) %>%
 
   mutate(
     ID = as.integer(ID),
 
-    # Convert CL/F units to L/h
-    # PKNCA returns in mg/(ng/mL) = 1000 L — multiply by 1000
+    # Convert CL/F to L/h
+    # PKNCA returns mg/(ng/mL) which equals 1000 L
+    # Multiply by 1000 to get L/h
     cl.obs = cl.obs * 1000
   ) %>%
 
-  # Rename columns to match our project convention
   rename(
     AUClast = auclast,
     Cmax    = cmax,
@@ -202,6 +222,7 @@ nca_clean <- nca_raw %>%
     t_half  = half.life,
     CLF     = cl.obs
   ) %>%
+
   arrange(ARM, ID)
 
 cat("\n✓ Results extracted\n")
@@ -212,12 +233,9 @@ print(head(nca_clean, 6))
 
 # ── STEP 9: Compute Table 2 summary statistics ────────────────────────────────
 #
-# Table 2 reports: median (IQR) per arm for each parameter
-# IQR = interquartile range = 25th to 75th percentile
-#
-# WHY MEDIAN not MEAN?
-#   PK parameters with small samples (n=12) can be skewed by one outlier
-#   Median is resistant to outliers — it is the preferred measure
+# Table 2 reports median (IQR) per arm
+# IQR = 25th to 75th percentile
+# Median preferred over mean for small samples (n=12) — resistant to outliers
 
 fmt <- function(x) {
   x <- na.omit(x)
@@ -241,30 +259,30 @@ summary_table <- nca_clean %>%
 print(summary_table)
 
 cat("\n── COMPARE TO PAPER (Table 2, Dunvald 2022) ──────────────\n")
-cat("Paper No inducer  AUClast: 5.99 (5.57-6.97)\n")
+cat("Paper No inducer  AUClast : 5.99 (5.57-6.97)\n")
 cat("Paper With inducer AUClast: 4.16 (3.88-5.08)\n")
 cat("──────────────────────────────────────────────────────────\n")
 
 
 # ── STEP 10: Compute GMR with 95% CI ─────────────────────────────────────────
 #
-# GMR = Geometric Mean Ratio = with inducer / without inducer
+# GMR = Geometric Mean Ratio = (with inducer) / (without inducer)
 #
-# HOW IT IS CALCULATED:
-#   1. Log-transform both arms' values
-#   2. Run a paired t-test (same subjects in both arms = paired)
-#   3. The mean difference on log scale = log(GMR)
-#   4. Back-transform: exp(log(GMR)) = GMR
+# Calculation method:
+#   1. Log-transform both arms (PK parameters are log-normally distributed)
+#   2. Paired t-test on log values (paired = same subject in both arms)
+#   3. Mean difference on log scale = log(GMR)
+#   4. Back-transform: exp(difference) = GMR
 #   5. exp(95% CI on log scale) = 95% CI on GMR scale
 #
-# INTERPRETATION:
+# Interpretation:
 #   GMR = 0.70 → 30% reduction in exposure (induction)
 #   GMR = 1.00 → no change
 #   GMR = 1.50 → 50% increase (inhibition)
 #
-# BIOEQUIVALENCE BOUNDARY: 0.80 to 1.25
-#   If ENTIRE 95% CI is within 0.80-1.25 → no clinically relevant DDI
-#   If CI crosses outside → clinically significant DDI
+# Bioequivalence no-effect boundaries: 0.80 to 1.25
+#   Entire CI within  0.80-1.25 → no clinically relevant DDI
+#   Entire CI outside 0.80-1.25 → clinically significant DDI
 
 no_ind   <- nca_clean %>% filter(ARM == "No_inducer")   %>% arrange(ID)
 with_ind <- nca_clean %>% filter(ARM == "With_inducer") %>% arrange(ID)
@@ -305,32 +323,36 @@ print(gmr_results %>% select(Parameter, GMR_CI, p_value, Outside_BE))
 
 auc <- gmr_results %>% filter(Parameter == "AUClast")
 
-cat("\n── PRIMARY RESULT ──────────────────────────────────────────\n")
+cat("\n── PRIMARY RESULT ───────────────────────────────────────────\n")
 cat("AUClast GMR:", auc$GMR,
     "(95% CI:", auc$CI_lower, "-", auc$CI_upper, ")\n")
 cat("Exposure reduction:", round((1 - auc$GMR) * 100, 0), "%\n")
 cat("Significant DDI?  ", auc$Outside_BE, "\n")
-cat("────────────────────────────────────────────────────────────\n")
+cat("─────────────────────────────────────────────────────────────\n")
 
-cat("\n── COMPARE TO PAPER ────────────────────────────────────────\n")
+cat("\n── COMPARE TO PAPER ─────────────────────────────────────────\n")
 cat("Paper AUClast GMR : 0.70 (0.65-0.75)\n")
 cat("Your  AUClast GMR :", auc$GMR_CI, "\n")
 cat("Paper Cmax    GMR : 0.88 (0.86-0.91)\n")
 cat("Your  Cmax    GMR :",
-    gmr_results %>% filter(Parameter=="Cmax") %>% pull(GMR_CI), "\n")
+    gmr_results %>% filter(Parameter == "Cmax") %>% pull(GMR_CI), "\n")
 cat("Paper t½      GMR : 0.68 (0.63-0.73)\n")
 cat("Your  t½      GMR :",
-    gmr_results %>% filter(Parameter=="t_half") %>% pull(GMR_CI), "\n")
-cat("────────────────────────────────────────────────────────────\n")
+    gmr_results %>% filter(Parameter == "t_half") %>% pull(GMR_CI), "\n")
+cat("Paper CL/F    GMR : 1.48 (1.38-1.59)\n")
+cat("Your  CL/F    GMR :",
+    gmr_results %>% filter(Parameter == "CL_F") %>% pull(GMR_CI), "\n")
+cat("─────────────────────────────────────────────────────────────\n")
 
 
-# ── STEP 11: Tmax — Wilcoxon test ─────────────────────────────────────────────
+# ── STEP 11: Tmax — Wilcoxon test ────────────────────────────────────────────
 #
-# WHY WILCOXON for Tmax?
-#   Tmax is categorical — it can only be one of the sampling timepoints
-#   0.5, 1, 1.5, 2, 3, 4... It is not normally distributed.
-#   Wilcoxon rank-sum test does not assume normality.
-#   The paper (p.1860) specifically uses Wilcoxon for Tmax.
+# WHY WILCOXON for Tmax but paired t-test for AUC?
+#   AUC is continuous — can be 5.67 or 6.23 or any value → t-test
+#   Tmax is categorical — can ONLY be one of the sampling timepoints
+#   (0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12) → not normally distributed
+#   Wilcoxon does not assume normality → correct test for Tmax
+#   Paper (p.1860) explicitly states Wilcoxon for Tmax
 
 wt <- wilcox.test(
   no_ind$Tmax,
@@ -341,19 +363,19 @@ wt <- wilcox.test(
 
 cat("\n=== TMAX ANALYSIS ===\n")
 cat("No inducer   Tmax: median",
-    median(no_ind$Tmax, na.rm=TRUE), "h",
-    "range", min(no_ind$Tmax, na.rm=TRUE),
-    "-", max(no_ind$Tmax, na.rm=TRUE), "h\n")
+    median(no_ind$Tmax, na.rm = TRUE), "h  range",
+    min(no_ind$Tmax, na.rm = TRUE), "-",
+    max(no_ind$Tmax, na.rm = TRUE), "h\n")
 cat("With inducer Tmax: median",
-    median(with_ind$Tmax, na.rm=TRUE), "h",
-    "range", min(with_ind$Tmax, na.rm=TRUE),
-    "-", max(with_ind$Tmax, na.rm=TRUE), "h\n")
+    median(with_ind$Tmax, na.rm = TRUE), "h  range",
+    min(with_ind$Tmax, na.rm = TRUE), "-",
+    max(with_ind$Tmax, na.rm = TRUE), "h\n")
 cat("Wilcoxon p-value:", round(wt$p.value, 4), "\n")
 cat("Significant (p<0.05)?",
     ifelse(wt$p.value < 0.05, "Yes", "No"), "\n")
 
 
-# ── STEP 12: Build final Table 2 ──────────────────────────────────────────────
+# ── STEP 12: Build final Table 2 ─────────────────────────────────────────────
 
 table2_final <- tibble(
   Parameter = c(
@@ -368,24 +390,24 @@ table2_final <- tibble(
     fmt(no_ind$Cmax),
     fmt(no_ind$t_half),
     fmt(no_ind$CLF),
-    paste0(median(no_ind$Tmax, na.rm=TRUE),
-           " (", min(no_ind$Tmax, na.rm=TRUE),
-           "-",  max(no_ind$Tmax, na.rm=TRUE), ")")
+    paste0(median(no_ind$Tmax, na.rm = TRUE),
+           " (", min(no_ind$Tmax, na.rm = TRUE),
+           "-",  max(no_ind$Tmax, na.rm = TRUE), ")")
   ),
   `With inducer (median IQR)` = c(
     fmt(with_ind$AUClast),
     fmt(with_ind$Cmax),
     fmt(with_ind$t_half),
     fmt(with_ind$CLF),
-    paste0(median(with_ind$Tmax, na.rm=TRUE),
-           " (", min(with_ind$Tmax, na.rm=TRUE),
-           "-",  max(with_ind$Tmax, na.rm=TRUE), ")*")
+    paste0(median(with_ind$Tmax, na.rm = TRUE),
+           " (", min(with_ind$Tmax, na.rm = TRUE),
+           "-",  max(with_ind$Tmax, na.rm = TRUE), ")*")
   ),
   `GMR (95% CI)` = c(
-    gmr_results %>% filter(Parameter=="AUClast") %>% pull(GMR_CI),
-    gmr_results %>% filter(Parameter=="Cmax")    %>% pull(GMR_CI),
-    gmr_results %>% filter(Parameter=="t_half")  %>% pull(GMR_CI),
-    gmr_results %>% filter(Parameter=="CL_F")    %>% pull(GMR_CI),
+    gmr_results %>% filter(Parameter == "AUClast") %>% pull(GMR_CI),
+    gmr_results %>% filter(Parameter == "Cmax")    %>% pull(GMR_CI),
+    gmr_results %>% filter(Parameter == "t_half")  %>% pull(GMR_CI),
+    gmr_results %>% filter(Parameter == "CL_F")    %>% pull(GMR_CI),
     "NA"
   )
 )
