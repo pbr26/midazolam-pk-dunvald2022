@@ -1,9 +1,9 @@
 ---
 title: "Reproduction of Dunvald et al. (2022): Statistical Analysis of a Clinical Pharmacokinetic DDI Study"
 subtitle: "Midazolam (CYP3A4) with and without a CYP3A inducer — 12 healthy volunteers"
-author: "[Your Name]"
+author: "Pramod BR"
 date: today
-date-format: "DD MMMM YYYY"
+date-format: "06 Jun 2026"
 
 format:
   html:
@@ -26,9 +26,6 @@ execute:
   warning: false
   message: false
   cache: false               # Always run fresh (reproducibility)
-
-bibliography: references.bib
-csl: pharmacology.csl        # Download from Zotero style repo
 
 ---
 
@@ -184,6 +181,6 @@ sessionInfo()
 
 ---
 
-*Reproduction by [Your Name]. Source code: [GitHub](https://github.com/YOUR_USERNAME/midazolam-pk-dunvald2022)*
+*Reproduction by Pramod. Source code: [GitHub](https://github.com/pbr26/midazolam-pk-dunvald2022)*
 
 *Original paper: Dunvald et al. Clin Transl Sci. 2022;15:1856–1866. [DOI: 10.1111/cts.13305](https://doi.org/10.1111/cts.13305)*
