@@ -1,0 +1,5 @@
+Parameter,GMR,CI_lower,CI_upper,GMR_CI,p_value,Outside_BE
+AUClast,0.72,0.72,0.73,0.72 (0.72-0.73),0,Yes - significant DDI
+Cmax,0.9,0.89,0.91,0.9 (0.89-0.91),0,No - within boundary
+t_half,0.78,0.75,0.8,0.78 (0.75-0.8),0,Yes - significant DDI
+CL_F,1.36,1.35,1.37,1.36 (1.35-1.37),0,Yes - significant DDI
