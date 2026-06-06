@@ -204,3 +204,4 @@ cat("  This file is the INPUT for all NCA and plotting scripts.\n")
 
 cat("\n=== SECTION COMPLETE ===\n")
 cat("Next step: open R/02_descriptive_stats.R\n")
+
