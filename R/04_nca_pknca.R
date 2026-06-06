@@ -171,7 +171,6 @@ cat("\nParameters calculated by PKNCA:\n")
 cat(paste(unique(nca_raw$PPTESTCD), collapse=", "), "\n")
 
 nca_clean <- nca_raw %>%
-  # Keep only the 5 parameters that match Table 2
   filter(PPTESTCD %in% c("auclast","cmax","tmax","half.life","cl.obs")) %>%
   select(SID, PPTESTCD, PPORRES) %>%
 

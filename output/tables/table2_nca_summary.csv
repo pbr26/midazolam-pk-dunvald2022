@@ -1,4 +1,4 @@
-Parameter,Without inducer,With inducer,GMR (95% CI)
+Parameter,Without inducer (median IQR),With inducer (median IQR),GMR (95% CI)
 AUClast (ng.h/mL),5.85 (5.51-6.22),4.25 (3.99-4.48),0.72 (0.72-0.73)
 Cmax (ng/mL),1.29 (1.26-1.36),1.17 (1.12-1.23),0.9 (0.89-0.91)
 t1/2 (h),1.76 (1.72-1.83),1.38 (1.35-1.41),0.78 (0.75-0.8)
