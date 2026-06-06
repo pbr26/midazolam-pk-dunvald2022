@@ -130,7 +130,7 @@ midazolam-pk-dunvald2022/
 │   ├── 01_load_data.R          # Reconstruct Table S1, reshape to long format
 │   ├── 02_descriptive_stats.R  # Table 1: demographics
 │   ├── 03_pk_plots.R           # Figure 2 (mean ± SD) + Figure 3 (spaghetti)
-│   ├── 04_nca_pknca.R         # NCA with ncappc (paper method)
+│   ├── 04_nca_pknca.R          # NCA with PKNCA — Table 2, GMR, 95% CI
 │   ├── 04b_nca_pknca.R         # NCA with PKNCA (cross-validation)
 │   ├── 05_gmr_testing.R        # GMR, 95% CI, paired t-test, Wilcoxon
 │   └── 06_sample_size.R        # Power and sample size calculation
@@ -192,5 +192,4 @@ Please cite the original paper (Dunvald et al. 2022) if you build on this work.
   volume  = {15},
   pages   = {1856--1866},
   doi     = {10.1111/cts.13305}
-}gi
-```
+}
