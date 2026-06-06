@@ -63,7 +63,7 @@ This project was developed to practice and demonstrate:
 |--------|----------------|--------|
 | Table 1 — Demographics | Section 4 | `R/02_descriptive_stats.R` |
 | Figure 2 — Mean ± SD concentration–time curve | Section 4 | `R/03_pk_plots.R` |
-| Table 2 — NCA parameters (AUClast, Cmax, t½, CL/F) | Section 4 | `R/04_nca_ncappc.R` |
+| Table 2 — NCA parameters (AUClast, Cmax, t½, CL/F) | Section 4 | `R/04_nca_pknca.R` |
 | GMR + 95% CI (bioequivalence assessment) | Section 3.1 | `R/05_gmr_testing.R` |
 | Figure 3 — Spaghetti plot of individual CL/F | Section 4 | `R/03_pk_plots.R` |
 | Sample size calculation | Appendix S1 VII | `R/06_sample_size.R` |
@@ -111,7 +111,7 @@ source("R/00_setup.R")        # Package install (first time only)
 source("R/01_load_data.R")    # Reconstruct dataset
 source("R/02_descriptive_stats.R")
 source("R/03_pk_plots.R")
-source("R/04_nca_ncappc.R")
+source("R/04_nca_pknca.R")
 source("R/05_gmr_testing.R")
 source("R/06_sample_size.R")
 
@@ -130,7 +130,7 @@ midazolam-pk-dunvald2022/
 │   ├── 01_load_data.R          # Reconstruct Table S1, reshape to long format
 │   ├── 02_descriptive_stats.R  # Table 1: demographics
 │   ├── 03_pk_plots.R           # Figure 2 (mean ± SD) + Figure 3 (spaghetti)
-│   ├── 04_nca_ncappc.R         # NCA with ncappc (paper method)
+│   ├── 04_nca_pknca.R         # NCA with ncappc (paper method)
 │   ├── 04b_nca_pknca.R         # NCA with PKNCA (cross-validation)
 │   ├── 05_gmr_testing.R        # GMR, 95% CI, paired t-test, Wilcoxon
 │   └── 06_sample_size.R        # Power and sample size calculation
@@ -194,13 +194,3 @@ Please cite the original paper (Dunvald et al. 2022) if you build on this work.
   doi     = {10.1111/cts.13305}
 }gi
 ```
-=======
-# midazolam-pk-dunvald2022
-Reproduction of Dunvald 2022 clinical PK tutorial in R
-
-## Acknowledgment
-
-This project is an independent educational effort and is not affiliated with, endorsed by, or sponsored by the original authors, journal, or publishers.
->>>>>>> 8c4fd1451b11b9497e456fa58aac0ce51bb56f54
-
-
